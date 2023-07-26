@@ -240,5 +240,5 @@ class Coupling :
     def __init__(self) :
         self.size = str
         
-    def coupling_type(size) :
+    def coupling_valve(size) :
         size = self.size
