@@ -11,7 +11,7 @@
 
 배관과 관련된 각종 추가 기능들이 들어갈 수 있게 확장성을 고려하여 설계
 
-class Pipe, Elbow, Tee, Reducer, Cap, Union, Flange, Valve, Coupling
+class Pipe, Elbow, Tee, Reducer, Cap, Flange, Valve, Coupling
 
 Attribute size, sch, sub_size, subsize, joint_type, degree, flange_rating, flange_tyep, long_or_short, valve_type, valve_rating
 
