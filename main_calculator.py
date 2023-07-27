@@ -65,6 +65,12 @@ def all_clear(result) :
     print("계산값 초기화")
     return result
 
+def get_values_in_parentheses(text):
+    pattern = r"\(([^)]+)\)"
+    matches = re.findall(pattern, text)
+    
+    return tuple(tuple(match.split(', ')) for match in matches)[0]
+
 result = 0
 previous_result = result
 
