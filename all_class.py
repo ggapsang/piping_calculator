@@ -41,7 +41,7 @@ class Elbow :
         size = self.size
         sch = self.sch
 
-    def get_elbow_span(self) :
+    def get_span(self) :
         size = self.size
         sch = self.sch
         joint_type = self.joint_type
@@ -52,7 +52,7 @@ class Tee :
     size : float    
     subsize : float
     sch : str
-    joint_types : str
+    joint_type : str
     
     def __init__(self, size, sch, joint_type, subsize) :
         self.size = size
@@ -71,7 +71,7 @@ class Tee :
         size = self.size
         sch = self.sch
     
-    def get_tee_span(self) :
+    def get_span(self) :
         size = self.size
         subsize = self.subsize
         joint_type = self.joint_type
@@ -79,11 +79,16 @@ class Tee :
             size, subsize = subsize, size
         else :
             pass
+
+    def get_short_span(self) :
+        size = self.size
+        subsize = self.subsize
+        joint_type = self.joint_type
         
 class Reducer :
     size : float    
     sch : str
-    joint_types : str
+    joint_type : str
     subsize : float
     def __init__(self, size, sch, joint_type, subsize) :
         self.size = size
@@ -102,7 +107,7 @@ class Reducer :
         size = self.size
         sch = self.sch
         
-    def get_reducer_span(self) :
+    def get_span(self) :
         size = self.size
         subsize = self.subsize
         joint_type = self.joint_type
@@ -114,7 +119,7 @@ class Reducer :
 class Cap :    
     size : float    
     sch : str
-    joint_types : str
+    joint_type : str
     def __init__(self, size, sch, joint_type) :
         self.size = size
         self.sch = sch
@@ -130,40 +135,23 @@ class Cap :
     def get_thick(self) :
         size = self.size
         sch = self.sch
-    def cap_value(self) :
+
+    def get_span(self) :
         size = self.size
         joint_type = self.joint_type
-
-class Boss :
-    size : float    
-    subsize : float    
-    def __init__(self, size, sch) :
-        self.size = size
-        self.sch = sch
-    
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def boss_value(self) :
-        size = self.size
-
 
 class Union :
     size : float
     def __init__(self, size) :
         self.size = size
     
-    def union_value(self) :
+    def get_span(self) :
         size = self.size
 
 class Flange :
     size : float    
     sch : str    
-    joint_types : str
+    joint_type : str
     flange_type : str
     flange_rating : str
     def __init__(self, size, sch, flange_type, flange_rating) :
@@ -183,7 +171,7 @@ class Flange :
         size = self.size
         sch = self.sch
         
-    def get_flange_span(self) :
+    def get_span(self) :
         size = self.size
         sch = self.sch
         flange_type = self.flange_type
@@ -192,7 +180,7 @@ class Flange :
 class Valve :
     size : float    
     sch : str
-    joint_types : str
+    joint_type : str
     valve_types : str
     valve_rating : str
     def __init__(self, size, sch, valve_type, joint_type) :
@@ -212,7 +200,7 @@ class Valve :
         size = self.size
         sch = self.sch
 
-    def get_valve_span(self) :
+    def get_span(self) :
         size = self.size
         sch = self.sch
         valve_type = self.valve_type
@@ -223,5 +211,5 @@ class Coupling :
     def __init__(self) :
         self.size = str
 
-    def get_coupling_span(self) :
+    def get_span(self) :
         size = self.size
