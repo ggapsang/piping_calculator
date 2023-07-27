@@ -1,184 +1,167 @@
 class Pipe :
-    size : str    
+    size : float    
     sch : str    
     def __init__(self, size, sch) :
         self.size = size
         self.sch = sch
-
-    def outdia(self) :
+    
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def thick(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-
+    def get_thick(self) :
+        size = self.size
+        sch = self.sch
+        
 class Elbow :
-    size : str    
+    size : float    
     sch : str
     joint_type : str
-    degree : str
+    degree : float
     long_or_short : str
     
-    def __init__(self, size, sch, joint_type, long_or_short) :
+    def __init__(self, size, sch, joint_type, degree, long_or_short) :
         self.size = size
         self.sch = sch
         self.joint_type = joint_type
         self.degree = degree
         self.long_or_short = long_or_short
-
-    def outdia(self) :
+    
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-    def thick(self) :
+    def get_thick(self) :
         size = self.size
         sch = self.sch
 
-    def elbow_value(self) :
+    def get_elbow_span(self) :
         size = self.size
         sch = self.sch
         joint_type = self.joint_type
         degree = self.degree
         long_or_short = self.long_or_short
   
-class EqualTee :
-    size : str    
+class Tee :
+    size : float    
+    subsize : float
     sch : str
     joint_types : str
     
-    def __init__(self, size, sch, joint_type) :
-        self.size = size
-        self.sch = sch
-        self.joint_type = joint_type
-
-    def outdia(self) :
-        size = self.size
-        
-    def india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def thick(self) :
-        size = self.size
-        sch = self.sch
-
-    def equal_tee_value(self) :
-        size = self.size
-        joint_type = self.joint_type
-        
-        
-class RedTee :
-    size : str    
-    sch : str 
-    joint_types : str
-    subsize : str
     def __init__(self, size, sch, joint_type, subsize) :
         self.size = size
         self.sch = sch
         self.joint_type = joint_type
         self.subsize = subsize
 
-    def outdia(self) :
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-    def thick(self) :
+    def get_thick(self) :
         size = self.size
         sch = self.sch
-
-    def red_tee_value(size, subsize, joint_type) :
+    
+    def get_tee_span(self) :
         size = self.size
         subsize = self.subsize
         joint_type = self.joint_type
-
+        if subsize > size :
+            size, subsize = subsize, size
+        else :
+            pass
+        
 class Reducer :
-    size : str    
+    size : float    
     sch : str
     joint_types : str
-    subsize : str
+    subsize : float
     def __init__(self, size, sch, joint_type, subsize) :
         self.size = size
         self.sch = sch
         self.joint_type = joint_type
         self.subsize = subsize
-
-    def outdia(self) :
+    
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def thick(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-    def reducer_value(size, subsize, joint_type) :
+    def get_thick(self) :
+        size = self.size
+        sch = self.sch
+        
+    def get_reducer_span(self) :
         size = self.size
         subsize = self.subsize
         joint_type = self.joint_type
+        if subsize > size :
+            size, subsize = subsize, size
+        else :
+            pass
 
 class Cap :    
-    size : str    
+    size : float    
     sch : str
     joint_types : str
     def __init__(self, size, sch, joint_type) :
         self.size = size
         self.sch = sch
         self.joint_type = joint_type
-
-    def outdia(self) :
+    
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-    def thick(self) :
+    def get_thick(self) :
         size = self.size
-        sch = self.sch :
-
+        sch = self.sch
     def cap_value(self) :
         size = self.size
         joint_type = self.joint_type
 
 class Boss :
-    size : str    
-    subsize : str    
+    size : float    
+    subsize : float    
     def __init__(self, size, sch) :
         self.size = size
         self.sch = sch
-
-    def outdia(self) :
+    
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
     def boss_value(self) :
+        size = self.size
+
 
 class Union :
-    size : str
+    size : float
     def __init__(self, size) :
         self.size = size
-
+    
     def union_value(self) :
-        self.size = input
+        size = self.size
 
 class Flange :
-    size : str    
+    size : float    
     sch : str    
     joint_types : str
     flange_type : str
@@ -186,28 +169,28 @@ class Flange :
     def __init__(self, size, sch, flange_type, flange_rating) :
         self.size = size
         self.sch = sch
-        self.flang_type = flang_type
-        self.flang_rating = flang_rating
+        self.flang_type = flange_type
+        self.flang_rating = flange_rating
 
-    def outdia(self) :
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def thick(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-    def flange_value(self) :
+    def get_thick(self) :
+        size = self.size
+        sch = self.sch
+        
+    def get_flange_span(self) :
         size = self.size
         sch = self.sch
         flange_type = self.flange_type
         flange_rating = self.flange_rating
         
 class Valve :
-    size : str    
+    size : float    
     sch : str
     joint_types : str
     valve_types : str
@@ -217,28 +200,28 @@ class Valve :
         self.sch = sch
         self.valve_type = valve_type
         self.joint_type = joint_type
-
-    def outdia(self) :
+    
+    def get_outdia(self) :
         size = self.size
         
-    def india(self) :
+    def get_india(self) :
         size = self.size
         sch = self.sch
         
-    def thick(self) :
+    def get_thick(self) :
         size = self.size
         sch = self.sch
 
-    def valve_value(size, valve_type, joint_type) :
+    def get_valve_span(self) :
         size = self.size
         sch = self.sch
         valve_type = self.valve_type
         joint_type = self.joint_type
 
 class Coupling :
-    size : str
+    size : float
     def __init__(self) :
         self.size = str
-        
-    def coupling_valve(size) :
+
+    def get_coupling_span(self) :
         size = self.size
