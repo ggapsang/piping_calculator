@@ -140,14 +140,6 @@ class Cap :
         size = self.size
         joint_type = self.joint_type
 
-class Union :
-    size : float
-    def __init__(self, size) :
-        self.size = size
-    
-    def get_span(self) :
-        size = self.size
-
 class Flange :
     size : float    
     sch : str    
