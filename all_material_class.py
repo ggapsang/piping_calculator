@@ -23,12 +23,13 @@ class Elbow :
     degree : float
     long_or_short : str
     
-    def __init__(self, size, sch, joint_type, degree, long_or_short) :
+    def __init__(self, size, sch, rating, joint_type, degree, long_or_short) :
         self.size = size
         self.sch = sch
         self.joint_type = joint_type
         self.degree = degree
         self.long_or_short = long_or_short
+        self.rating = rating
     
     def get_outdia(self) :
         size = self.size
@@ -145,12 +146,12 @@ class Flange :
     sch : str    
     joint_type : str
     flange_type : str
-    flange_rating : str
-    def __init__(self, size, sch, flange_type, flange_rating) :
+    rating : str
+    def __init__(self, size, sch, flange_type, rating) :
         self.size = size
         self.sch = sch
         self.flang_type = flange_type
-        self.flang_rating = flange_rating
+        self.flang_rating = rating
 
     def get_outdia(self) :
         size = self.size
@@ -167,14 +168,14 @@ class Flange :
         size = self.size
         sch = self.sch
         flange_type = self.flange_type
-        flange_rating = self.flange_rating
+        rating = self.rating
         
 class Valve :
     size : float    
     sch : str
     joint_type : str
     valve_types : str
-    valve_rating : str
+    rating : str
     def __init__(self, size, sch, valve_type, joint_type) :
         self.size = size
         self.sch = sch
