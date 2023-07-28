@@ -1,4 +1,4 @@
-# Calculator for plumbing
+# Calculator for Piping and Pipefitter
 
 It performs 4 arithmetic operations like a general calculator, but if you enter piping material specifications instead of numbers (ex: 2 10-inch elbows + 10*6 reducer), it finds the length of the material in the database and converts it into numbers to perform calculations.
 (Material specifications are stored in .csv file format based on ASTM standards)
