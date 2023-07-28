@@ -1,0 +1,8 @@
+1. 각 클래스 매서드 완성
+2. command 부분 작동 가능하게 완성
+3. material.csv에 밸브 등 자료 추가
+4. show_all command 추가, 해당 피팅의 모든 스펙을 보여줌
+5. show command 추가 outdia, india, thickness, sch 등의 값을 찾아줌
+
+6. 전체 기장을 주고 커팅 플랜을 역으로 뽑아내는 명령어 추가
+7. 명령어 설명 텍스트 파일 작성. 프로그램 실행 시 맨 앞에 띄울 수 있게 함.
