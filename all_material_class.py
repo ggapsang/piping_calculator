@@ -1,208 +1,79 @@
-class Pipe :
-    size : float    
-    sch : str    
-    def __init__(self, size, sch) :
-        self.size = size
+### Material Classes ###
+class Material:
+    def __init__(self, material_data, size, sch='std', rating=None, joint_type='bw', degree=90, long_or_short='lr'):
+        self.material_data = material_data
+        self.size = float(size)
         self.sch = sch
-    
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
-        
-class Elbow :
-    size : float    
-    sch : str
-    joint_type : str
-    degree : float
-    long_or_short : str
-    
-    def __init__(self, size, sch, rating, joint_type, degree, long_or_short) :
-        self.size = size
-        self.sch = sch
+        self.rating = rating
         self.joint_type = joint_type
+
+    def get_outdia(self):
+        raise NotImplementedError
+
+    def get_india(self):
+        raise NotImplementedError
+
+    def get_thick(self):
+        raise NotImplementedError
+    
+    def get_span(self) :
+        pass
+
+class Pipe(Material):
+    def __init__(self, size, sch):
+        super().__init__(None, size, sch)
+
+
+class Elbow(Material):
+    def __init__(self, material_data, size, sch='std', rating=None, joint_type='bw', degree=90, long_or_short='lr'):
+        super().__init__(material_data, size, sch, rating, joint_type)
+        self.name = 'elbow'
         self.degree = degree
         self.long_or_short = long_or_short
-        self.rating = rating
-    
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
 
     def get_span(self) :
-        size = self.size
-        sch = self.sch
+        name = self.name
+        material_data = self.material_data
+        size = float(self.size)
         joint_type = self.joint_type
         degree = self.degree
         long_or_short = self.long_or_short
-  
-class Tee :
-    size : float    
-    subsize : float
-    sch : str
-    joint_type : str
-    
-    def __init__(self, size, sch, joint_type, subsize) :
-        self.size = size
-        self.sch = sch
-        self.joint_type = joint_type
+        span = search_value_in_df(material_data, result_col='span', name=name, size=size, joint_type=joint_type, degree=degree, long_or_short=long_or_short)
+        return span   
+
+
+class Tee(Material):
+    def __init__(self, material_data, size, subsize, sch='std', rating=None, joint_type='bw'):
+        super().__init__(material_data, size, sch, rating, joint_type)
+        self.name = 'tee'
         self.subsize = subsize
 
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
-    
-    def get_span(self) :
-        size = self.size
-        subsize = self.subsize
-        joint_type = self.joint_type
-        if subsize > size :
-            size, subsize = subsize, size
-        else :
-            pass
 
-    def get_short_span(self) :
-        size = self.size
-        subsize = self.subsize
-        joint_type = self.joint_type
-        
-class Reducer :
-    size : float    
-    sch : str
-    joint_type : str
-    subsize : float
-    def __init__(self, size, sch, joint_type, subsize) :
-        self.size = size
-        self.sch = sch
-        self.joint_type = joint_type
+class Reducer(Material):
+    def __init__(self, material_data, size, subsize, sch='std', rating=None, joint_type='bw'):
+        super().__init__(material_data, size, sch, rating, joint_type)
+        self.name = 'reducer'
         self.subsize = subsize
-    
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_span(self) :
-        size = self.size
-        subsize = self.subsize
-        joint_type = self.joint_type
-        if subsize > size :
-            size, subsize = subsize, size
-        else :
-            pass
 
-class Cap :    
-    size : float    
-    sch : str
-    joint_type : str
-    def __init__(self, size, sch, joint_type) :
-        self.size = size
-        self.sch = sch
-        self.joint_type = joint_type
-    
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
 
-    def get_span(self) :
-        size = self.size
-        joint_type = self.joint_type
+class Cap(Material):
+    def __init__(self, material_data, size, sch='std', rating=None, joint_type='bw'):
+        super().__init__(material_data, size, sch, rating, joint_type)
+        self.name = 'cap'
 
-class Flange :
-    size : float    
-    sch : str    
-    joint_type : str
-    flange_type : str
-    rating : str
-    def __init__(self, size, sch, flange_type, rating) :
-        self.size = size
-        self.sch = sch
-        self.flang_type = flange_type
-        self.flang_rating = rating
 
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_span(self) :
-        size = self.size
-        sch = self.sch
-        flange_type = self.flange_type
-        rating = self.rating
-        
-class Valve :
-    size : float    
-    sch : str
-    joint_type : str
-    valve_types : str
-    rating : str
-    def __init__(self, size, sch, valve_type, joint_type) :
-        self.size = size
-        self.sch = sch
+class Flange(Material):
+    def __init__(self, size, sch, flange_type, rating):
+        super().__init__(None, size, sch, rating)
+        self.flange_type = flange_type
+
+
+class Valve(Material):
+    def __init__(self, size, sch, valve_type, joint_type):
+        super().__init__(None, size, sch, None, joint_type)
         self.valve_type = valve_type
-        self.joint_type = joint_type
-    
-    def get_outdia(self) :
-        size = self.size
-        
-    def get_india(self) :
-        size = self.size
-        sch = self.sch
-        
-    def get_thick(self) :
-        size = self.size
-        sch = self.sch
 
-    def get_span(self) :
-        size = self.size
-        sch = self.sch
-        valve_type = self.valve_type
-        joint_type = self.joint_type
 
-class Coupling :
-    size : float
-    def __init__(self) :
-        self.size = str
-
-    def get_span(self) :
-        size = self.size
+class Coupling(Material):
+    def __init__(self, size):
+        super().__init__(None, size)
