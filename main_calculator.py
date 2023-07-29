@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import math
 
 ### Material Classes ###
 class Material:
@@ -41,10 +42,18 @@ class Elbow(Material):
         joint_type = self.joint_type
         degree = self.degree
         long_or_short = self.long_or_short
-        span = search_value_in_df(material_data, result_col='span', name=name, size=size, joint_type=joint_type, degree=degree, long_or_short=long_or_short)
-        return span   
-
-
+        if degree = 45 or 90 :
+            span = search_value_in_df(material_data, result_col='span', name=name, size=size, joint_type=joint_type, degree=degree, long_or_short=long_or_short)
+            return span
+        else :
+            radian_degree = math.radians(degree)
+            if long_or_short == 'sr' :
+                span = 1.0 * 25.4 * tan(radian_degree/2)
+                return span
+            else :
+                span = 1.5 * 25.4 * tang(radian_dgree/2)
+                return span
+                
 class Tee(Material):
     def __init__(self, material_data, size, subsize, sch='std', rating=None, joint_type='bw'):
         super().__init__(material_data, size, sch, rating, joint_type)
