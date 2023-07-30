@@ -15,38 +15,40 @@ class Material:
         name = 'pipe'
         material_data = self.material_data
         size = float(self.size)
-        outdia = search_value_in_df(material_data, outdia, name=name, size=size)
-        return outdia
+        outdia = search_value_in_df(material_data, result_col= 'outdia', name=name, size=size)
+        return float(outdia)
 
     def get_india(self):
         name = 'pipe'
         material_data = self.material_data
         size = float(self.size)
         sch = self.sch
-        india = search_value_in_df(material_data, india, name=name, size=size, sch=sch)
-        return india
+        india = search_value_in_df(material_data, result_col= 'india', name=name, size=size, sch=sch)
+        return float(india)
 
     def get_thick(self) :
         name = 'pipe'
         material_data = self.material_data
         size = float(self.size)
         sch = self.sch
-        thick = search_value_in_df(material_data, thick, name=name, size=size, sch=sch)
-        return thick
+        thick = search_value_in_df(material_data, result_col='thick', name=name, size=size, sch=sch)
+        return float(thick)
     
     def get_sch(self) :
         name = 'pipe'
         material_data = material_data
         size = float(self.size)
         thick = float(self.get_thick)
-        sch = search_value_in_df(material_data, sch, name=name, size=size, thick=thick)
+        sch = search_value_in_df(material_data, result_col='sch', name=name, size=size, thick=thick)
+        return sch
     
     def get_span(self) :
         pass
 
 class Pipe(Material):
-    def __init__(self, size, sch):
-        super().__init__(None, size, sch)
+    def __init__(self, material_data, size, sch='std'):
+        super().__init__(material_data, size, sch)
+        self.name = 'pipe'
 
 class Elbow(Material):
     def __init__(self, material_data, size, sch='std', rating=None, joint='bw', degree=90, radius='lr'):
@@ -86,7 +88,7 @@ class Tee(Material):
         name = self.name
         material_data = self.material_data
         size = float(self.size)
-        subsize = float(subsize)
+        subsize = float(self.subsize)
         joint = self.joint
         rating = self.rating
 
@@ -97,7 +99,7 @@ class Tee(Material):
         name = self.name
         material_data = self.material_data
         size = float(self.size)
-        subsize = float(subsize)
+        subsize = float(self.subsize)
         joint = self.joint
         rating = self.rating
 
@@ -108,7 +110,7 @@ class Tee(Material):
         name = self.name
         material_data = material_data
         size = float(size)
-        subsize = float(subsize)
+        subsize = float(self.subsize)
         joint = self.joint
         rating = self.rating
 
@@ -189,6 +191,7 @@ class Coupling(Material):
         rating =self.rating
 
         span = search_value_in_df(material_data, result_col='span', name=name, size=size, rating=rating)
+        return span
     
 
 ### Caculate class ###
@@ -196,20 +199,20 @@ class Calculate :
     
     values_to_calculate : tuple
 
-    def __init__(self, tuple_for_sum, result) :
-        self.tuple_for_sum = tuple_for_sum
+    def __init__(self, tup_for_arithmetic, result) :
+        self.tup_for_arithmetic = tup_for_arithmetic
         self.result = result
     
     def add(self) :
-        tuple_for_sum = self.tuple_for_sum
+        tup_for_arithmetic = self.tup_for_arithmetic
         result = self.result
-        sum_of_tuple = sum(tuple_for_sum)
+        sum_of_tuple = sum(tup_for_arithmetic)
         result = result + sum_of_tuple
 
         return result
 
     def subtract(self) :
-        input_values = self.input_values
+        input_values = self.tup_for_arithmetic
         result = self.result
         sum_of_input_values = sum(input_values)
         result = result - sum_of_input_values
@@ -217,21 +220,18 @@ class Calculate :
         return result
 
     def mutiply(self) :
-        input_values = self.input_values
+        input_values = self.tup_for_arithmetic
         result = self.result
-        sum_of_input_values = sum(input_values)
-        result = result * sum_of_input_values
-        
+        for element in input_values :
+            result = result * element
         return result
     
     def divide(self) :
-        input_values = self.input_values
+        input_values = self.tup_for_arithmetic
         result = self.result
-        sum_of_input_values = sum(input_values)
-        result = result + sum_of_input_values
-
+        for element in input_values :
+            result = result / element
         return result
-
 
 ## Functions to process command##
 def search_value_in_df(material_data, result_col, **conditions) :
@@ -252,7 +252,6 @@ def search_value_in_df(material_data, result_col, **conditions) :
 
     if not filtered_data.empty : 
         return filtered_data.iloc[0][result_col]
-
     return 0
 
 # input 값을 comma 기준으로 텍스트 나누어 튜플로 받는다. 단 "()"안의 값들은 분리되지 않음#
@@ -306,88 +305,8 @@ def contains_substring(tup, string) :
     return False
 # input value()를 통해 받은 튜플은 각 원소들이 문자형이므로 실수형으로 반환한다. 이때 명령어 ****(ex elbow())**** 등과 같은 것들도 값을 해석하여 모두 계산 가능한 실수값으로 표시한다.
 
-def get_tuple_can_sum(input_values, material_data, classes) :
-    def interpret(value, material_data) :
-
-        value = value.replace(" ", "") # 공백 제거
-        class_name, arg_str = value.split("(") #"("를 기준으로 앞에를 class, 뒤의 부분의 값들을 입력값으로 구분        
-        product_result_front = check_the_asterisk(class_name)
-        product_result_back = check_the_asterisk(arg_str)
-
-        class_name = class_name.split("*")[-1]
-        arg_str = arg_str.split("*")[0]
-        arg_str = arg_str[:-1] #맨 뒤의 닫힘 괄호를 지움
-
-        arg = arg_str.split(",") # ,를 기준으로 입력값들을 분리
-
-        arg_dict = {'material_data' : material_data}
-        for element_arg in arg :
-            if '=' in element_arg :
-                key, val = element_arg.split('=')
-                if val.isnumeric():
-                    arg_dict[key] = int(val) if val.isdigit() else float(val)
-                else :
-                    arg_dict[key] = val
-            else :
-                arg_dict['size'] = int(element_arg) if element_arg.isdigit() else element_arg
-
-        #arg.insert(0, material_data)
-
-        if class_name == 'elbow' :
-            the_elbow = Elbow(**arg_dict)
-            the_span = the_elbow.get_span()
-            return the_span * product_result_front * product_result_back
-
-        elif class_name == 'tee' :
-            the_tee = Tee(**arg_dict)
-            the_span = the_tee.get_span()
-            return the_span * product_result_front * product_result_back
-
-        elif class_name == 'reducer':
-            the_reducer = Reducer(**arg_dict)
-            the_span = the_reducer.get_span()
-            return the_span * product_result_front * product_result_back
-
-        elif class_name == 'cap' :
-            the_cap = Cap(**arg_dict)
-            the_span = the_cap.get_span()
-            return the_span * product_result_front * product_result_back
-
-        elif class_name == 'flange':
-            the_flange = Flange(**arg_dict)
-            the_span = the_flange.get_span()
-            return the_span * product_result_front * product_result_back
-
-        elif class_name == 'valve':
-            the_valve = Valve(**arg_dict)
-            the_span = the_valve.get_span()
-            return the_span * product_result_front * product_result_back
-
-        elif class_name == 'coupling' :
-            the_coupling = Coupling(**arg_dict)
-            the_span = the_coupling.get_span()
-            return the_span * product_result_front * product_result_back
-
-        else : 
-            raise ValueError(f"Unknown class : {class_name}")
-    
-    lst_to_be_tuple = []
-    for value in input_values :
-        if contains_substring(classes, value) is True :
-            span = interpret(value, material_data)
-            lst_to_be_tuple.append(span)
-        else :
-            try :
-                lst_to_be_tuple.append(float(value)) 
-            except :
-                product_result = check_the_asterisk(value)
-                lst_to_be_tuple.append(product_result)
-
-    tuple_for_sum = tuple(lst_to_be_tuple)
-
-    return tuple_for_sum
-
-def make_material(value, material_data) :
+# 사용자에게 받은 명령어를 class 생성에 입력 가능한 방식으로 바꾼다. 
+def interpret(value, material_data) :
 
     value = value.replace(" ", "") # 공백 제거
     class_name, arg_str = value.split("(") #"("를 기준으로 앞에를 class, 뒤의 부분의 값들을 입력값으로 구분        
@@ -400,59 +319,184 @@ def make_material(value, material_data) :
 
     arg = arg_str.split(",") # ,를 기준으로 입력값들을 분리
 
-    arg_dict = {'material_data' : material_data}
-    for element_arg in arg :
-        if '=' in element_arg :
-            key, val = element_arg.split('=')
-            if val.isnumeric():
-                arg_dict[key] = int(val) if val.isdigit() else float(val)
+    if class_name == 'tee' or class_name == 'reducer' : #subsize를 갖는 피팅들
+        arg_dict = {'material_data' : material_data}
+        first_size = 0  
+        for element_arg in arg :
+            if '=' in element_arg :
+                key, val = element_arg.split('=')
+                if val.isnumeric():
+                    arg_dict[key] = int(val) if val.isdigit() else float(val)
+                else :
+                    arg_dict[key] = val
             else :
-                arg_dict[key] = val
-        else :
-            arg_dict['size'] = int(element_arg) if element_arg.isdigit() else element_arg
+                if first_size == 0 :
+                    arg_dict['size'] = int(element_arg) if element_arg.isdigit() else element_arg
+                    first_size = 1 
+                else :
+                    arg_dict['subsize'] = int(element_arg) if element_arg.isdigit() else element_arg
+                    first_size = 0
 
+    else :
+        arg_dict = {'material_data' : material_data}
+        for element_arg in arg :
+            if '=' in element_arg :
+                key, val = element_arg.split('=')
+                if val.isnumeric():
+                    arg_dict[key] = int(val) if val.isdigit() else float(val)
+                else :
+                    arg_dict[key] = val
+            else :
+                arg_dict['size'] = int(element_arg) if element_arg.isdigit() else element_arg
+
+    return class_name, arg_dict, product_result_front, product_result_back
     #arg.insert(0, material_data)
 
-    if class_name == 'elbow' :
-        the_elbow = Elbow(**arg_dict)
-        the_span = the_elbow.get_span()
-        return the_span * product_result_front * product_result_back
+# interpret 함수를 통해 받은 명령어를 한번 더 해석하여 연산이 가능한 숫자 형태의 튜플을 만든다
+def get_tup_for_arithmetic(input_values, material_data, classes) :
+    
+    lst_to_be_tuple = []
+    for value in input_values :
+        if contains_substring(classes, value) is True :
+            span = interpret(value, material_data)
+            if span[0] == 'elbow' :
+                the_elbow = Elbow(**span[1])
+                the_span = the_elbow.get_span()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    elif class_name == 'tee' :
-        the_tee = Tee(**arg_dict)
-        the_span = the_tee.get_span()
-        return the_span * product_result_front * product_result_back
+            elif span[0] == 'tee' :
+                the_tee = Tee(**span[1])
+                the_span = the_tee.get_span()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    elif class_name == 'reducer':
-        the_reducer = Reducer(**arg_dict)
-        the_span = the_reducer.get_span()
-        return the_span * product_result_front * product_result_back
+            elif span[0] == 'reducer':
+                the_reducer = Reducer(**span[1])
+                the_span = the_reducer.get_span()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    elif class_name == 'cap' :
-        the_cap = Cap(**arg_dict)
-        the_span = the_cap.get_span()
-        return the_span * product_result_front * product_result_back
+            elif span[0] == 'cap' :
+                the_cap = Cap(**span[1])
+                the_span = the_cap.get_span()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    elif class_name == 'flange':
-        the_flange = Flange(**arg_dict)
-        the_span = the_flange.get_span()
-        return the_span * product_result_front * product_result_back
+            elif span[0] == 'flange':
+                the_flange = Flange(**span[1])
+                the_span = the_flange.get_span()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    elif class_name == 'valve':
-        the_valve = Valve(**arg_dict)
-        the_span = the_valve.get_span()
-        return the_span * product_result_front * product_result_back
+            elif span[0] == 'valve':
+                the_valve = Valve(**span[1])
+                the_span = the_valve.get_span()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    elif class_name == 'coupling' :
-        the_coupling = Coupling(**arg_dict)
-        the_span = the_coupling.get_span()
-        return the_span * product_result_front * product_result_back
+            elif span[0] == 'coupling' :
+                the_coupling = Coupling(**span[1])
+                the_span = the_coupling.get_span()
+                if the_span == 0 : 
+                    print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
 
-    else : 
-        raise ValueError(f"Unknown class : {class_name}")
+            else : 
+                raise ValueError(f"Unknown class : {span[0]}")
+            
+            lst_to_be_tuple.append(the_span)
 
+        else :
+            try :
+                lst_to_be_tuple.append(float(value)) 
+            except :
+                product_result = check_the_asterisk(value)
+                lst_to_be_tuple.append(product_result)
 
+    tup_for_arithmetic = tuple(lst_to_be_tuple)
 
+    return tup_for_arithmetic
+
+# material class의 공통 속성을 보여준다. "show me" 커맨드를 위한 함수
+def show_me_attribute(input_values, material_data, classes, attribute) :
+
+    for value in input_values :
+        if contains_substring(classes, value) is True :
+            span = interpret(value, material_data)
+            if span[0] == 'elbow' :
+                the_elbow = Elbow(**span[1])
+                the_span = getattr(the_elbow, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 피팅입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            elif span[0] == 'tee' :
+                the_tee = Tee(**span[1])
+                the_span = getattr(the_tee, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 피팅입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            elif span[0] == 'reducer':
+                the_reducer = Reducer(**span[1])
+                the_span = getattr(the_reducer, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 피팅입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            elif span[0] == 'cap' :
+                the_cap = Cap(**span[1])
+                the_span = getattr(the_cap, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다.", value, "값을 제외하고 계산합니다.")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            elif span[0] == 'flange':
+                the_flange = Flange(**span[1])
+                the_span = getattr(the_flange, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 피팅입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            elif span[0] == 'valve':
+                the_valve = Valve(**span[1])
+                the_span = getattr(the_valve, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 피팅입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            elif span[0] == 'coupling' :
+                the_coupling = Coupling(**span[1])
+                the_span = getattr(the_coupling, attribute)()
+                if the_span == 0 : 
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 피팅입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+            
+            elif span[0] == 'pipe' :
+                the_pipe = Pipe(**span[1])
+                the_span = getattr(the_pipe, attribute)()
+                if the_span == 0 :
+                    print("값을 찾을 수 없습니다. ASTM 규격에 없는 값입니다")
+                the_span = the_span * span[2] * span[3]
+                return the_span
+
+            else : 
+                raise ValueError(f"확인 불가능한 명령 : {span[0]}")
+ 
 ### Prompt part ###
 classes = ('pipe', 'elbow', 'flange', 'reducer', 'tee', 'valve', 'coupling')
 material_data = pd.read_csv('material.csv')
@@ -469,8 +513,8 @@ while True :
             continue
         else :
             previous_result= back_up_result(result)
-            tuple_for_sum = get_tuple_can_sum(give_me, material_data, classes)
-            do_command = Calculate(tuple_for_sum, result)
+            tup_for_arithmetic = get_tup_for_arithmetic(give_me, material_data, classes)
+            do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.add()
 
     elif command == "subtract" :
@@ -480,46 +524,111 @@ while True :
             continue
         else :
             previous_result= back_up_result(result)
-            tuple_for_sum = get_tuple_can_sum(give_me, material_data, classes)
-            do_command = Calculate(tuple_for_sum, result)
+            tup_for_arithmetic = get_tup_for_arithmetic(give_me, material_data, classes)
+            do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.subtract()
     
-    elif command == "mutiply" :
+    elif command == "multi" :
         give_me =input_values()
         
         if 'back' in give_me :
             continue
         else :
             previous_result= back_up_result(result)
-            tuple_for_sum = get_tuple_can_sum(give_me, material_data, classes)
-            do_command = Calculate(tuple_for_sum, result)
+            tup_for_arithmetic = get_tup_for_arithmetic(give_me, material_data, classes)
+            do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.mutiply()
     
-    elif command == "divde" :
+    elif command == "divide" :
         give_me =input_values()
 
         if 'back' in give_me :
             continue
         else :
             previous_result= back_up_result(result)
-            tuple_for_sum = get_tuple_can_sum(give_me, material_data, classes)
-            do_command = Calculate(tuple_for_sum, result)
-            result = do_command.divde()
+            tup_for_arithmetic = get_tup_for_arithmetic(give_me, material_data, classes)
+            do_command = Calculate(tup_for_arithmetic, result)
+            result = do_command.divide()
 
     elif command == "clear" :
         previous_result= back_up_result(result)
         result = all_clear(result)
 
     elif command == "exit" :
-        break
+        exit()
 
     elif command == "cancel" :
         result = previous_result
 
-    elif command == "show me" :
-        give_me = input_values()
-        
-        if 'back' in give_me :
-            continue
-        else :
-            show_me 
+    elif 'show me' in command :
+        if 'outdia' in command :        
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_outdia')
+                    print(do_command)
+        elif 'india' in command :
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_india')
+                    print(do_command)
+        elif 'thick' in command :
+            give_me = input_values()
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_thick')
+                    print(do_command)
+        elif 'sch' in command :
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in command :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_sch')
+                    print(do_command)
+        elif 'span' in command :
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else : 
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_span')
+                    print(do_command)        
+        elif 'half span' in command :
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_span_half')
+                    print(do_command)
+        elif 'short span' in command :
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_short_span')
+                    print(do_command)
