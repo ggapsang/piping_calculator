@@ -261,7 +261,7 @@ def input_values() :
         pattern = r"\S*\([^)]*\)|\S+"
         matches = re.findall(pattern, text)
         return tuple(matches)
-    input_values = input()
+    input_values = input("입력값 : ")
     input_values = split_text(input_values)
     return input_values
 
@@ -496,15 +496,23 @@ def show_me_attribute(input_values, material_data, classes, attribute) :
 
             else : 
                 raise ValueError(f"확인 불가능한 명령 : {span[0]}")
- 
+
+def show_read_me(read_me):
+    with open(str(read_me), 'r', encoding='utf-8') as fp_read_me :
+        for line in fp_read_me.readlines() :
+            print(line.strip())
+
 ### Prompt part ###
 classes = ('pipe', 'elbow', 'flange', 'reducer', 'tee', 'valve', 'coupling')
 material_data = pd.read_csv('material.csv')
 result = 0
 previous_result = result
+read_me = 'read me.txt'
+show_read_me(read_me)
+
 
 while True :
-    command = input("명령을 입력하세요 : [result = " + str(result) + "] ")
+    command = input("명령을 입력하세요(도움말을 다시 보려면 help라고 치세요) : [현재값 = " + str(result) + "] ")
     
     if command == "add" :
         give_me = input_values()
@@ -632,3 +640,5 @@ while True :
                 else :
                     do_command = show_me_attribute(give_me, material_data, classes, 'get_short_span')
                     print(do_command)
+    elif 'help' in command :
+        show_read_me(read_me)
