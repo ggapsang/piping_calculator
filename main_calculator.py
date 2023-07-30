@@ -4,12 +4,27 @@ import math
 
 ### Material Classes ###
 class Material:
-    def __init__(self, material_data, size, sch='std', rating=None, joint='bw', degree=90, radius='lr'):
+    default_values = {
+        'sch' : 'std',
+        'rating' : None,
+        'joint' : 'bw',
+        'degree' : 90,
+        'radius' : 'lr',
+        'flange_type' : 'wn',
+        'valve_type' : None,
+    }
+
+    def __init__(self, material_data, size, sch=None, rating=None, joint=None, degree=None, radius=None, flange_type=None, valve_type=None):
         self.material_data = material_data
         self.size = float(size)
-        self.sch = sch
-        self.rating = rating
-        self.joint = joint
+        self.sch = sch if sch else Material.default_values['sch']
+        self.rating = rating if rating else Material.default_values['rating']
+        self.joint = joint if joint else Material.default_values['joint']
+        self.rating = rating if rating else Material.default_values['rating']
+        self.degree = degree if degree else Material.default_values['degree']
+        self.radius = radius if radius else Material.default_values['radius']
+        self.flange_type = flange_type if flange_type else Material.default_values['flange_type']
+        self.valve_type = valve_type if valve_type else Material.default_values['valve_type']
 
     def get_outdia(self):
         name = 'pipe'
@@ -44,6 +59,21 @@ class Material:
     
     def get_span(self) :
         pass
+    
+    def set_value_for_all_materials(key, value):
+        for subclass in Material.__subclasses__():
+            subclass.set_value(key, value)
+
+    @classmethod
+    def set_value(cls, key, value):
+        if key in cls.default_values:
+            if isinstance(cls.default_values[key], float):
+                cls.default_values[key] = float(value)
+            else:
+                cls.default_values[key] = value
+        else:
+            raise KeyError(f'{key} is not a valid key. Choose from: {list(cls.default_values.keys())}') 
+
 
 class Pipe(Material):
     def __init__(self, material_data, size, sch='std'):
@@ -51,12 +81,23 @@ class Pipe(Material):
         self.name = 'pipe'
 
 class Elbow(Material):
-    def __init__(self, material_data, size, sch='std', rating=None, joint='bw', degree=90, radius='lr'):
-        super().__init__(material_data, size, sch, rating, joint)
-        self.name = 'elbow'
-        self.degree = degree
-        self.radius = radius
+    default_values = {
+    'sch' : 'std',
+    'rating' : None,
+    'joint' : 'bw',
+    'degree' : 90,
+    'radius' : 'lr',
+    'flange_type' : 'wn',
+    'valve_type' : None,
+    }
 
+    
+    def __init__(self, material_data, size, sch='std', rating=None, joint='bw', degree=90, radius='lr'):
+        super().__init__(material_data, size, sch, rating, joint, degree, radius)
+        self.name = 'elbow'
+        self.default_values = Material.default_values.copy()
+
+        
     def get_span(self) :
         name = self.name
         material_data = self.material_data
@@ -77,6 +118,14 @@ class Elbow(Material):
             else :
                 span = 1.5 * 25.4 * math.tan(radian_degree/2)
                 return span
+
+    @classmethod
+    def set_value(cls, key, value):
+        if key in cls.default_values:
+            if isinstance(cls.default_values[key], float):
+                cls.default_values[key] = float(value)
+            else:
+                cls.default_values[key] = value 
                 
 class Tee(Material):
     def __init__(self, material_data, size, subsize, sch='std', rating=None, joint='bw'):
@@ -150,8 +199,7 @@ class Cap(Material):
 
 class Flange(Material):
     def __init__(self, size, sch, flange_type, rating):
-        super().__init__(None, size, sch, rating)
-        self.flange_type = flange_type
+        super().__init__(material_data, size, sch, rating, flange_type)
         self.name = 'flange'
 
     def get_span(self) :
@@ -165,9 +213,8 @@ class Flange(Material):
 
 class Valve(Material):
     def __init__(self, size, sch, valve_type, joint):
-        super().__init__(None, size, sch, None, joint)
+        super().__init__(material_data, size, sch, valve_type, joint)
         self.name = 'valve'
-        self.valve_type = valve_type
         self.joint = joint
     
     def get_span(self):
@@ -180,10 +227,9 @@ class Valve(Material):
         return span
 
 class Coupling(Material):
-    def __init__(self, size):
-        super().__init__(None, size)
+    def __init__(self, size, rating):
+        super().__init__(size, rating)
         self.name = 'copling'
-        rating = 'rating'
 
     def get_span(self):
         name = self.name
@@ -503,7 +549,16 @@ def show_read_me(read_me):
             print(line.strip())
 
 ### Prompt part ###
-classes = ('pipe', 'elbow', 'flange', 'reducer', 'tee', 'valve', 'coupling')
+classes = (
+    'pipe', 
+    'elbow',
+    'tee',
+    'reducer',
+    'cap', 
+    'flange',
+    'valve',
+    'coupling',
+)
 material_data = pd.read_csv('material.csv')
 result = 0
 previous_result = result
@@ -514,7 +569,7 @@ show_read_me(read_me)
 while True :
     command = input("명령을 입력하세요(도움말을 다시 보려면 help라고 치세요) : [현재값 = " + str(result) + "] ")
     
-    if command == "add" :
+    if command.startswith("add") :
         give_me = input_values()
 
         if 'back' in give_me :
@@ -525,7 +580,7 @@ while True :
             do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.add()
 
-    elif command == "subtract" :
+    elif command.startswith("subtract") :
         give_me =input_values()
         
         if 'back' in give_me :
@@ -536,7 +591,7 @@ while True :
             do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.subtract()
     
-    elif command == "multi" :
+    elif command.startswith("multi") :
         give_me =input_values()
         
         if 'back' in give_me :
@@ -547,7 +602,7 @@ while True :
             do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.mutiply()
     
-    elif command == "divide" :
+    elif command.startswith("divide") :
         give_me =input_values()
 
         if 'back' in give_me :
@@ -558,17 +613,17 @@ while True :
             do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.divide()
 
-    elif command == "clear" :
+    elif command.startswith("clear") :
         previous_result= back_up_result(result)
         result = all_clear(result)
 
-    elif command == "exit" :
+    elif command.startswith("exit") :
         exit()
 
-    elif command == "cancel" :
+    elif command.startswith("cancel") :
         result = previous_result
 
-    elif 'show me' in command :
+    elif command.startswith('show me') :
         if 'outdia' in command :        
             while True :
                 give_me = input_values()
@@ -640,5 +695,21 @@ while True :
                 else :
                     do_command = show_me_attribute(give_me, material_data, classes, 'get_short_span')
                     print(do_command)
-    elif 'help' in command :
+
+    elif command.startswith('set value') :
+        command_subtract_setvalue = command[10 :]
+        key_values = command_subtract_setvalue.split()
+        for key_value in key_values:
+            if "=" in key_value :
+                parts = key_value.split('=')
+                key = parts[0]
+                value = parts[1]
+                try:
+                    Material.set_value_for_all_materials(key, value)
+                except KeyError as e:
+                    print("오류")
+            else: 
+                print(key_value)
+
+    elif command.startswith('help') :
         show_read_me(read_me)
