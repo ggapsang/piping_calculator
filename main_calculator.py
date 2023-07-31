@@ -60,44 +60,25 @@ class Material:
     def get_span(self) :
         pass
     
-    def set_value_for_all_materials(key, value):
-        for subclass in Material.__subclasses__():
-            subclass.set_value(key, value)
-
     @classmethod
-    def set_value(cls, key, value):
-        if key in cls.default_values:
-            if isinstance(cls.default_values[key], float):
-                cls.default_values[key] = float(value)
+    def set_value(cls, attribute, value):
+        if attribute in cls.default_values:
+            if attribute in cls.default_values :
+                cls.default_values[attribute] = value
             else:
-                cls.default_values[key] = value
-        else:
-            raise KeyError(f'{key} is not a valid key. Choose from: {list(cls.default_values.keys())}') 
+                print(f'{attribute}는 유효한 속성값이 아닙니다 다음의 리스트를 참조하세요: {list(cls.default_values.keys())}') 
 
 
 class Pipe(Material):
-    def __init__(self, material_data, size, sch='std'):
+    def __init__(self, material_data, size, sch=None):
         super().__init__(material_data, size, sch)
         self.name = 'pipe'
 
 class Elbow(Material):
-    default_values = {
-    'sch' : 'std',
-    'rating' : None,
-    'joint' : 'bw',
-    'degree' : 90,
-    'radius' : 'lr',
-    'flange_type' : 'wn',
-    'valve_type' : None,
-    }
-
-    
-    def __init__(self, material_data, size, sch='std', rating=None, joint='bw', degree=90, radius='lr'):
+    def __init__(self, material_data, size, sch=None, rating=None, joint=None, degree=None, radius=None):
         super().__init__(material_data, size, sch, rating, joint, degree, radius)
         self.name = 'elbow'
-        self.default_values = Material.default_values.copy()
 
-        
     def get_span(self) :
         name = self.name
         material_data = self.material_data
@@ -118,17 +99,9 @@ class Elbow(Material):
             else :
                 span = 1.5 * 25.4 * math.tan(radian_degree/2)
                 return span
-
-    @classmethod
-    def set_value(cls, key, value):
-        if key in cls.default_values:
-            if isinstance(cls.default_values[key], float):
-                cls.default_values[key] = float(value)
-            else:
-                cls.default_values[key] = value 
-                
+        
 class Tee(Material):
-    def __init__(self, material_data, size, subsize, sch='std', rating=None, joint='bw'):
+    def __init__(self, material_data, size, subsize, sch=None, rating=None, joint=None):
         super().__init__(material_data, size, sch, rating, joint)
         self.name = 'tee'
         self.subsize = subsize
@@ -167,7 +140,7 @@ class Tee(Material):
         return span
 
 class Reducer(Material):
-    def __init__(self, material_data, size, subsize, sch='std', rating=None, joint='bw'):
+    def __init__(self, material_data, size, subsize, sch=None, rating=None, joint=None):
         super().__init__(material_data, size, sch, rating, joint)
         self.name = 'reducer'
         self.subsize = subsize
@@ -184,7 +157,7 @@ class Reducer(Material):
         return span
 
 class Cap(Material):
-    def __init__(self, material_data, size, sch='std', rating=None, joint='bw'):
+    def __init__(self, material_data, size, sch=None, rating=None, joint=None):
         super().__init__(material_data, size, sch, rating, joint)
         self.name = 'cap'
     
@@ -198,7 +171,7 @@ class Cap(Material):
         return span
 
 class Flange(Material):
-    def __init__(self, size, sch, flange_type, rating):
+    def __init__(self, size, sch=None, flange_type=None, rating=None):
         super().__init__(material_data, size, sch, rating, flange_type)
         self.name = 'flange'
 
@@ -212,7 +185,7 @@ class Flange(Material):
         return span
 
 class Valve(Material):
-    def __init__(self, size, sch, valve_type, joint):
+    def __init__(self, size, sch=None, valve_type=None, joint=None):
         super().__init__(material_data, size, sch, valve_type, joint)
         self.name = 'valve'
         self.joint = joint
@@ -227,7 +200,7 @@ class Valve(Material):
         return span
 
 class Coupling(Material):
-    def __init__(self, size, rating):
+    def __init__(self, size=None, rating=None):
         super().__init__(size, rating)
         self.name = 'copling'
 
@@ -697,19 +670,24 @@ while True :
                     print(do_command)
 
     elif command.startswith('set value') :
-        command_subtract_setvalue = command[10 :]
-        key_values = command_subtract_setvalue.split()
-        for key_value in key_values:
-            if "=" in key_value :
-                parts = key_value.split('=')
-                key = parts[0]
-                value = parts[1]
-                try:
-                    Material.set_value_for_all_materials(key, value)
-                except KeyError as e:
-                    print("오류")
-            else: 
-                print(key_value)
+        print('현재 설정된 spec 값 : ', Material.default_values)
+        while True :
+            second_command = input('설정 변경(속성=값) : ')
+            if second_command.startswith('back') :
+                break
+            else :
+                attr_values = second_command.split() #" "단위로 분리하여 여러 개의 'key=value'쌍들을 추출한 리스트를 만든다
+                #리스트에 있는 각각의 'key=value'형태의 원소를 '='단위로 다시 분리하여 Materail.set_default(attribute, new_value)에 대입한다.
+                for attr_value in attr_values : 
+                    attr_value_lst = attr_value.split('=')
+                    attribute = attr_value_lst[0]
+                    new_value = attr_value_lst[1]
+                    if new_value.isdigit() :
+                        new_value = float(new_value)
+                    else :
+                        pass 
+                    Material.set_value(attribute, new_value)
+                print('변경됨 : ', Material.default_values)
 
     elif command.startswith('help') :
         show_read_me(read_me)
