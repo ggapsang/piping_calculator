@@ -51,7 +51,7 @@ class Material:
     
     def get_sch(self) :
         name = 'pipe'
-        material_data = material_data
+        material_data = self.material_data
         size = float(self.size)
         thick = float(self.get_thick)
         sch = search_value_in_df(material_data, result_col='sch', name=name, size=size, thick=thick)
@@ -66,8 +66,7 @@ class Material:
             if attribute in cls.default_values :
                 cls.default_values[attribute] = value
             else:
-                print(f'{attribute}는 유효한 속성값이 아닙니다 다음의 리스트를 참조하세요: {list(cls.default_values.keys())}') 
-
+                print(f'{attribute}는 유효한 속성값이 아닙니다 다음의 리스트를 참조하세요: {list(cls.default_values.keys())}')
 
 class Pipe(Material):
     def __init__(self, material_data, size, sch=None):
@@ -130,8 +129,8 @@ class Tee(Material):
     
     def get_short_span(self) :
         name = self.name
-        material_data = material_data
-        size = float(size)
+        material_data = self.material_data
+        size = float(self.size)
         subsize = float(self.subsize)
         joint = self.joint
         rating = self.rating
@@ -167,11 +166,11 @@ class Cap(Material):
         joint = self.joint
         rating = self.rating
 
-        span = search_value_in_df(self, material_data, result_col='span', name=name, size=size, joint=joint, rating=rating)
+        span = search_value_in_df(material_data, result_col='span', name=name, size=size, joint=joint, rating=rating)
         return span
 
 class Flange(Material):
-    def __init__(self, material_dat, size, sch=None, flange_type=None, rating=None):
+    def __init__(self, material_data, size, sch=None, flange_type=None, rating=None):
         super().__init__(material_data, size, sch, rating, flange_type)
         self.name = 'flange'
 
@@ -201,7 +200,7 @@ class Valve(Material):
 
 class Coupling(Material):
     def __init__(self, material_data, size=None, rating=None):
-        super().__init__(size, rating)
+        super().__init__(size, material_data, rating)
         self.name = 'copling'
 
     def get_span(self):
@@ -273,9 +272,9 @@ def search_value_in_df(material_data, result_col, **conditions) :
         return filtered_data.iloc[0][result_col]
     return 0
 
-# input 값을 comma 기준으로 텍스트 나누어 튜플로 받는다. 단 "()"안의 값들은 분리되지 않음#
+# input 값을 스페이스 기준으로 텍스트 나누어 튜플로 받는다. 단 "()"안의 값들은 분리되지 않음#
 def input_values() :
-    # comma 기준으로 텍스트 나누어 튜플로 받는다. 단 "()"안의 값들은 분리되지 않음#
+    # 스페이스 기준으로 텍스트 나누어 튜플로 받는다. 단 "()"안의 값들은 분리되지 않음#
     def split_text(text):
         pattern = r"\S*\([^)]*\)|\S+"
         matches = re.findall(pattern, text)
@@ -340,7 +339,7 @@ def interpret(value, material_data) :
 
     if class_name == 'tee' or class_name == 'reducer' : #subsize를 갖는 피팅들
         arg_dict = {'material_data' : material_data}
-        first_size = 0  
+        first_size = 0
         for element_arg in arg :
             if '=' in element_arg :
                 key, val = element_arg.split('=')
@@ -351,7 +350,7 @@ def interpret(value, material_data) :
             else :
                 if first_size == 0 :
                     arg_dict['size'] = int(element_arg) if element_arg.isdigit() else element_arg
-                    first_size = 1 
+                    first_size = 1
                 else :
                     arg_dict['subsize'] = int(element_arg) if element_arg.isdigit() else element_arg
                     first_size = 0
@@ -446,7 +445,7 @@ def get_tup_for_arithmetic(input_values, material_data, classes) :
 # material class의 공통 속성을 보여준다. "show me" 커맨드를 위한 함수
 def show_me_attribute(input_values, material_data, classes, attribute) :
 
-    for value in input_values :
+     for value in input_values :
         if contains_substring(classes, value) is True :
             span = interpret(value, material_data)
             if span[0] == 'elbow' :
@@ -638,16 +637,6 @@ while True :
                 else :
                     do_command = show_me_attribute(give_me, material_data, classes, 'get_sch')
                     print(do_command)
-        elif 'span' in command :
-            while True :
-                give_me = input_values()
-                if 'back' in give_me :
-                    break
-                elif 'exit' in give_me :
-                    exit()
-                else : 
-                    do_command = show_me_attribute(give_me, material_data, classes, 'get_span')
-                    print(do_command)        
         elif 'half span' in command :
             while True :
                 give_me = input_values()
@@ -655,9 +644,9 @@ while True :
                     break
                 elif 'exit' in give_me :
                     exit()
-                else :
-                    do_command = show_me_attribute(give_me, material_data, classes, 'get_span_half')
-                    print(do_command)
+                else : 
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_half_span')
+                    print(do_command)        
         elif 'short span' in command :
             while True :
                 give_me = input_values()
@@ -667,6 +656,16 @@ while True :
                     exit()
                 else :
                     do_command = show_me_attribute(give_me, material_data, classes, 'get_short_span')
+                    print(do_command)
+        elif 'span' in command :
+            while True :
+                give_me = input_values()
+                if 'back' in give_me :
+                    break
+                elif 'exit' in give_me :
+                    exit()
+                else :
+                    do_command = show_me_attribute(give_me, material_data, classes, 'get_span')
                     print(do_command)
 
     elif command.startswith('set value') :
@@ -691,3 +690,5 @@ while True :
 
     elif command.startswith('help') :
         show_read_me(read_me)
+    else :
+        pass
