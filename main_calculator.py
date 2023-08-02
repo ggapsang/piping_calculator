@@ -167,11 +167,11 @@ class Cap(Material):
         joint = self.joint
         rating = self.rating
 
-        span = search_value_in_df(self, material_data, result_col=span, name=name, size=size, joint=joint, rating=rating)
+        span = search_value_in_df(self, material_data, result_col='span', name=name, size=size, joint=joint, rating=rating)
         return span
 
 class Flange(Material):
-    def __init__(self, size, sch=None, flange_type=None, rating=None):
+    def __init__(self, material_dat, size, sch=None, flange_type=None, rating=None):
         super().__init__(material_data, size, sch, rating, flange_type)
         self.name = 'flange'
 
@@ -185,7 +185,7 @@ class Flange(Material):
         return span
 
 class Valve(Material):
-    def __init__(self, size, sch=None, valve_type=None, joint=None):
+    def __init__(self, material_data, size, sch=None, valve_type=None, joint=None):
         super().__init__(material_data, size, sch, valve_type, joint)
         self.name = 'valve'
         self.joint = joint
@@ -200,7 +200,7 @@ class Valve(Material):
         return span
 
 class Coupling(Material):
-    def __init__(self, size=None, rating=None):
+    def __init__(self, material_data, size=None, rating=None):
         super().__init__(size, rating)
         self.name = 'copling'
 
