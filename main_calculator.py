@@ -73,7 +73,7 @@ class Pipe(Material):
     def __init__(self, material_data, size, sch=None):
         super().__init__(material_data, size, sch)
         self.name = 'pipe'
-
+                                  
 class Elbow(Material):
     def __init__(self, material_data, size, sch=None, rating=None, joint=None, degree=None, radius=None):
         super().__init__(material_data, size, sch, rating, joint, degree, radius)
@@ -426,7 +426,7 @@ def get_tup_for_arithmetic(input_values, material_data, classes) :
                 if the_span == 0 : 
                     print("값을 찾을 수 없습니다. ", value, "값을 제외하고 계산합니다.")
                 the_span = the_span * span[2] * span[3]
-
+        
             else : 
                 raise ValueError(f"Unknown class : {span[0]}")
             
@@ -436,8 +436,11 @@ def get_tup_for_arithmetic(input_values, material_data, classes) :
             try :
                 lst_to_be_tuple.append(float(value)) 
             except :
-                product_result = check_the_asterisk(value)
-                lst_to_be_tuple.append(product_result)
+                if 'load' in value :
+                    lst_to_be_tuple.append(load_value)
+                else :
+                    product_result = check_the_asterisk(value)
+                    lst_to_be_tuple.append(product_result)
 
     tup_for_arithmetic = tuple(lst_to_be_tuple)
 
@@ -544,6 +547,7 @@ while True :
     
     if command.startswith("add") :
         give_me = input_values()
+
 
         if 'back' in give_me :
             continue
@@ -691,5 +695,11 @@ while True :
 
     elif command.startswith('help') :
         show_read_me(read_me)
-    else :
-        pass
+    
+    elif command.startswith('save') :
+        with open('save_01.txt', 'w') as file :
+            file.write(str(result))
+
+    elif command.startswith('load') :
+            with open('save_01.txt', 'r', encoding='utf-8') as fp_load_value :
+                load_value = float(fp_load_value.read())
