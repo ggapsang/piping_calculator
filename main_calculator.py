@@ -212,7 +212,6 @@ class Coupling(Material):
         span = search_value_in_df(material_data, result_col='span', name=name, size=size, rating=rating)
         return span
     
-
 ### Caculate class ###
 class Calculate :
     
@@ -437,7 +436,7 @@ def get_tup_for_arithmetic(input_values, material_data, classes) :
                 lst_to_be_tuple.append(float(value)) 
             except :
                 if 'load' in value :
-                    lst_to_be_tuple.append(load_value)
+                    lst_to_be_tuple.append(load)
                 else :
                     product_result = check_the_asterisk(value)
                     lst_to_be_tuple.append(product_result)
@@ -537,10 +536,11 @@ classes = (
 )
 material_data = pd.read_csv('material.csv')
 result = 0
+load = 0
 previous_result = result
 read_me = 'read me.txt'
-show_read_me(read_me)
 
+show_read_me(read_me)
 
 while True :
     command = input("명령을 입력하세요(도움말을 다시 보려면 help라고 치세요) : [현재값 = " + str(result) + "] ")
@@ -557,7 +557,7 @@ while True :
             do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.add()
 
-    elif command.startswith("subtract") :
+    elif command.startswith("sub") :
         give_me =input_values()
         
         if 'back' in give_me :
@@ -579,7 +579,7 @@ while True :
             do_command = Calculate(tup_for_arithmetic, result)
             result = do_command.mutiply()
     
-    elif command.startswith("divide") :
+    elif command.startswith("div") :
         give_me =input_values()
 
         if 'back' in give_me :
@@ -697,9 +697,7 @@ while True :
         show_read_me(read_me)
     
     elif command.startswith('save') :
-        with open('save_01.txt', 'w') as file :
-            file.write(str(result))
+        load = result
 
     elif command.startswith('load') :
-            with open('save_01.txt', 'r', encoding='utf-8') as fp_load_value :
-                load_value = float(fp_load_value.read())
+        print(load)
