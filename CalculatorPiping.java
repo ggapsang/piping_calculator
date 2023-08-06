@@ -148,7 +148,7 @@ public class CalculatorPiping implements ActionListener {
                     result = num1 * num2;
                     break;
                 case '/':
-                    result = num1 * num2;
+                    result = num1 / num2;
                     break;
             }
             textField.setText(String.valueOf(result));
